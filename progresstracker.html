@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Progress Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            transition: background-color 0.5s ease;
+        }
+
+        header {
+            background-color: #6200ea;
+            padding: 1rem;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h1 {
+            color: #6200ea;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-inner {
+            height: 20px;
+            background-color: #6200ea;
+            width: 0;
+            transition: width 0.5s;
+        }
+
+        .quiz .question {
+            margin-bottom: 15px;
+        }
+
+        .quiz label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .quiz input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .submit-btn, .reset-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .submit-btn:hover, .reset-btn:hover {
+            background-color: #79fda5;
+            transform: scale(1.05);
+        }
+
+        .results {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .results h2 {
+            color: #6200ea;
+        }
+
+        footer {
+            background-color: #6200ea;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 20px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <button type="button" class="home-btn" onclick="location.href='index.html'">Home</button>
+        <h1>Mental Health Progress Tracker</h1>
+    </header>
+
+    <div class="container">
+        <h1>Track Your Mental Wellness</h1>
+        <div class="progress-bar">
+            <div class="progress-bar-inner"></div>
+        </div>
+
+        <form class="quiz">
+            <!-- Questions inserted dynamically via JavaScript -->
+            <button type="submit" class="submit-btn">Submit</button>
+            <button type="button" class="reset-btn">Reset</button>
+        </form>
+
+        <div class="results">
+            <h2>Your Results</h2>
+            <p id="result-text"></p>
+            <p id="suggestion-text"></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Mental Health Progress Tracker. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const questions = [
+            "How often have you been feeling down, depressed, or hopeless?",
+            "How often have you had little interest or pleasure in doing things?",
+            "How often have you felt nervous, anxious, or on edge?",
+            "How often have you felt unable to stop or control worrying?",
+            "How often have you felt tired or had little energy?",
+            "How often have you had trouble sleeping or sleeping too much?",
+            "How often have you felt bad about yourself or that you are a failure?",
+            "How often have you had trouble concentrating on things?",
+            "How often have you moved or spoken so slowly that other people could have noticed?",
+        ];
+
+        const quizForm = document.querySelector('.quiz');
+        const progressBarInner = document.querySelector('.progress-bar-inner');
+        const resultsDiv = document.querySelector('.results');
+        const resultText = document.getElementById('result-text');
+        const suggestionText = document.getElementById('suggestion-text');
+
+        questions.forEach((question, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('question');
+            questionDiv.innerHTML = `
+                <label>${index + 1}. ${question}</label>
+                <input type="radio" name="q${index}" value="0"> Not at all<br>
+                <input type="radio" name="q${index}" value="1"> Several days<br>
+                <input type="radio" name="q${index}" value="2"> More than half the days<br>
+                <input type="radio" name="q${index}" value="3"> Nearly every day<br>
+            `;
+            quizForm.insertBefore(questionDiv, quizForm.querySelector('.submit-btn'));
+        });
+
+        quizForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            let score = 0;
+            questions.forEach((_, index) => {
+                const answer = document.querySelector(`input[name="q${index}"]:checked`);
+                if (answer) {
+                    score += parseInt(answer.value);
+                }
+            });
+
+            progressBarInner.style.width = `${(score / (questions.length * 3)) * 100}%`;
+
+            resultText.textContent = `Your score is ${score}.`;
+            if (score < 10) {
+                suggestionText.textContent = "Your mental health seems to be in good shape. Keep it up!";
+            } else if (score < 20) {
+                suggestionText.textContent = "You might be experiencing some mild symptoms. Consider talking to someone you trust.";
+            } else {
+                suggestionText.textContent = "It is recommended to seek professional help.";
+            }
+
+            resultsDiv.style.display = 'block';
+        });
+
+        document.querySelector('.reset-btn').addEventListener('click', function() {
+            quizForm.reset();
+            progressBarInner.style.width = '0';
+            resultsDiv.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
